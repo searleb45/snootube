@@ -1,0 +1,18 @@
+{
+    "manifest_version": 2,
+    "name": "SnooTube",
+    "version": "0.0.1",
+
+    "description": "Replace YouTube comments with Reddit comments!",
+    "icons": {
+        // TODO: Icons
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["*://www.youtube.com/*"],
+            "css": ["snootube.css"],
+            "js": ["snootube.js"]
+        }
+    ]
+}
