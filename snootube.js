@@ -23,10 +23,13 @@ class SnooTubeMaterial {
   }
 
   showLoadingScreen() {
-    let loader = document.createElement('div');
-    loader.className = 'snoo-loading style-scope ytd-watch';
-    loader.innerText ='Loading a thing';
-    document.getElementById('main').appendChild( loader );
+    let loadingDiv = document.createElement('div'),
+        loader = document.createElement('div');
+    loadingDiv.id = 'comments';
+    loadingDiv.className = 'style-scope ytd-watch';
+    loader.className = 'snoo-loader';
+    loadingDiv.appendChild( loader );
+    document.getElementById('main').appendChild( loadingDiv );
   }
 
   findPostsForVideo( vidId ) {
