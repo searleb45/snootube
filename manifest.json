@@ -14,5 +14,9 @@
             "css": ["snootube.css"],
             "js": ["snootube.js"]
         }
+    ],
+
+    "permissions": [
+        "https://api.reddit.com/"
     ]
 }
