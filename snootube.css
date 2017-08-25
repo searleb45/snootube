@@ -39,3 +39,5 @@
     transform: rotate(360deg);
   }
 }
+
+.snoo-tabs,.snoo-threads,.snoo-no-results { display: none; }
