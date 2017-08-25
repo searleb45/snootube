@@ -6,6 +6,12 @@ class SnooTubeMaterial {
   constructor() {
     let self = this;
     self.redditAccessor = new RedditLoader(this);
+
+    window.addEventListener('message', (msg) => {
+      if( msg.data.type === 'RETRY_LOAD' ) {
+        self.findPostsForVideo( YoutubeData.getVideoId() );
+      }
+    })
     self.removeExistingComments(() => {
       self.findPostsForVideo( YoutubeData.getVideoId() );
     });
@@ -48,7 +54,12 @@ class SnooTubeMaterial {
     let nrContainer = document.createElement( 'div' );
     nrContainer.id = 'snooNoResultsFound';
     nrContainer.className = 'style-scope ytd-watch';
-    nrContainer.innerHTML = '<h3>No results found for this URL</h3><p><button onclick="snootubeInstance.findPostsForVideo( \"' + YoutubeData.getVideoId() + '\" )">Retry</button></p>';
+    nrContainer.innerHTML = `<h3>No results found for this URL</h3>`;
+
+    let retryButton = document.createElement('button');
+    retryButton.className = 'snoo-retry-button';
+    retryButton.addEventListener( 'click', () => window.postMessage({ type: "RETRY_LOAD" }, '*') );
+    nrContainer.appendChild( retryButton );
     document.getElementById('comments').parentNode.replaceChild(nrContainer, document.getElementById('comments'));
 
     this.hideLoadingScreen();
@@ -61,13 +72,18 @@ class SnooTubeMaterial {
   }
 
   showThreadResults( threadList ) {
-    let toShow = [];
+    let tabContainer = document.createElement('div'),
+        threadContainer = document.createElement('div');
+    tabContainer.className = 'snoo-tabs';
+    threadContainer.className = 'snoo-threads';
+
+    document.getElementById('comments').appendChild( tabContainer )
+    document.getElementById('comments').appendChild(threadContainer);
     threadList.forEach((item) => {
       if( item.data.url.match(YoutubeData.getVideoId()) ) {
-        toShow.push( item );
+        ContentRenderer.renderTab( item );
       }
     });
-    console.log('Final result set', toShow);
   }
 }
 
@@ -79,10 +95,15 @@ class SnooTube_Old {
 
 class ContentRenderer {
   static _loadTemplate( templateName ) {
-    fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'}).then((res) => {
-      res.text().then((body) => {
-        console.log(body);
-      })
+    return fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'})
+      .then(res => res.text())
+      .then(body => body);
+  }
+
+  static renderTab( redditResult ) {
+    this._loadTemplate( 'snootubeTabTemplate' ).then( (template) => {
+      console.log('Got template');
+      console.log(template);
     });
   }
 }
