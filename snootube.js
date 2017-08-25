@@ -40,12 +40,18 @@ class SnooTubeMaterial {
     document.getElementById('main').appendChild( this.loadingDiv );
   }
 
+  hideLoadingScreen() {
+    document.getElementById('main').removeChild( this.loadingDiv );
+  }
+
   showNoResults() {
     let nrContainer = document.createElement( 'div' );
     nrContainer.id = 'snooNoResultsFound';
     nrContainer.className = 'style-scope ytd-watch';
-    nrContainer.innerHTML = '<h3>No results found for this URL</h3>';
+    nrContainer.innerHTML = '<h3>No results found for this URL</h3><p><button onclick="snootubeInstance.findPostsForVideo( \"' + YoutubeData.getVideoId() + '\" )">Retry</button></p>';
     document.getElementById('comments').parentNode.replaceChild(nrContainer, document.getElementById('comments'));
+
+    this.hideLoadingScreen();
   }
 
   findPostsForVideo( vidId ) {
@@ -68,6 +74,16 @@ class SnooTubeMaterial {
 class SnooTube_Old {
   constructor() {
     console.log("Not material Youtube");
+  }
+}
+
+class ContentRenderer {
+  static _loadTemplate( templateName ) {
+    fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'}).then((res) => {
+      res.text().then((body) => {
+        console.log(body);
+      })
+    });
   }
 }
 

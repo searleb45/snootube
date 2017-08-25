@@ -12,8 +12,13 @@
         {
             "matches": ["*://www.youtube.com/*"],
             "css": ["snootube.css"],
-            "js": ["snootube.js"]
+            "js": ["mustache.min.js", "snootube.js"]
         }
+    ],
+
+    "web_accessible_resources": [
+        "templates/snootubeTabTemplate.html",
+        "templates/snootubeContentTemplate.html"
     ],
 
     "permissions": [
