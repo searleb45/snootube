@@ -42,7 +42,7 @@
 .snootube-container {
   color: var(--yt-primary-text-color);
 }
-.snoo-tabs,.snoo-threads,.snoo-no-results { display: none; }
+.snoo-tabs,.snoo-threads,.snoo-no-results,.snootube-post-body { display: none; }
 .visible { display: block; }
 
 .snoo-tabs.visible {

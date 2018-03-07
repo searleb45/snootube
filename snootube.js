@@ -90,6 +90,8 @@ class SnooTubeMaterial {
         let tab = await ContentRenderer.renderTab( item.data );
         tab.addEventListener('click', (e) => {
           console.log(e.target.dataset.id);
+          document.querySelectorAll('.snootube-post-body').forEach((el) => el.classList.remove('visible'));
+          document.getElementById(e.target.dataset.id).classList.add('visible');
         });
         tabList.push(tab);
 
@@ -114,7 +116,7 @@ class SnooTube_Old {
 
 class ContentRenderer {
   static async _loadTemplate( templateName ) {
-    console.log('fetching tab template');
+    console.log('loading template');
     let response = await fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'});
 
     if( response.status === 200 ) {
@@ -132,6 +134,11 @@ class ContentRenderer {
   static async renderPost( redditResult ) {
     ContentRenderer.postTemplate = ContentRenderer.postTemplate || await this._loadTemplate('snootubeMainPostTemplate');
     return this._templatize(ContentRenderer.postTemplate, redditResult);
+  }
+
+  static _getTimeAgo( postTime ) {
+    let now = Date.now();
+
   }
 
   static _templatize( templateString, data ) {
