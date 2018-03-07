@@ -76,7 +76,7 @@ class SnooTubeMaterial {
 
   // }
 
-  showThreadResults( threadList ) {
+  async showThreadResults( threadList ) {
     let tabContainer = document.createElement('div'),
         threadContainer = document.createElement('div');
     tabContainer.className = 'snoo-tabs';
@@ -84,28 +84,25 @@ class SnooTubeMaterial {
 
     document.getElementById('comments').appendChild( tabContainer )
     document.getElementById('comments').appendChild( threadContainer );
-
-    threadList.sort((a,b) => a.score - b.score);
-    threadList.forEach(async (item) => {
+    let tabList = [];
+    await Promise.all(threadList.map(async (item) => {
       if( item.data.url.match(YoutubeData.getVideoId()) ) {
         let tab = await ContentRenderer.renderTab( item.data );
-        tabContainer.innerHTML += tab;
-      }
-    });
+        tab.addEventListener('click', (e) => {
+          console.log(e.target.dataset.id);
+        });
+        tabList.push(tab);
 
-    let snooTabs = document.querySelectorAll('.snootube-tab');
-    [...snooTabs].forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        console.log(e.target.dataset.id);
-      });
-    });
-    // document.querySelectorAll('.snootube-tab').addEventListener('click', (e) => {
-    //   console.log(e.target.dataset.id);
-    //   //this.showPostView( e.target.dataset.id );
-    // });
+        let thread = await ContentRenderer.renderPost( item.data );
+        threadContainer.appendChild(thread);
+      }
+    }));
+    tabList.sort((a,b) => parseInt(b.getAttribute('score')) - parseInt(a.getAttribute('score')));
+    tabList.forEach((el) => tabContainer.appendChild(el));
 
     this.hideLoadingScreen();
     tabContainer.classList.add('visible');
+    threadContainer.classList.add('visible');
   }
 }
 
@@ -129,7 +126,18 @@ class ContentRenderer {
   static async renderTab( redditResult ) {
     ContentRenderer.tabTemplate = ContentRenderer.tabTemplate || await this._loadTemplate('snootubeTabTemplate');
     console.log(redditResult);
-    return mustache(ContentRenderer.tabTemplate, redditResult);
+    return this._templatize(ContentRenderer.tabTemplate, redditResult);
+  }
+
+  static async renderPost( redditResult ) {
+    ContentRenderer.postTemplate = ContentRenderer.postTemplate || await this._loadTemplate('snootubeMainPostTemplate');
+    return this._templatize(ContentRenderer.postTemplate, redditResult);
+  }
+
+  static _templatize( templateString, data ) {
+    let temp = document.createElement('div');
+    temp.innerHTML = mustache(templateString, data);
+    return temp.firstChild;
   }
 }
 

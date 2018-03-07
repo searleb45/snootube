@@ -66,3 +66,8 @@
 .snootube-tab:last-of-type {
   border-right: 0;
 }
+
+.post-title a {
+  color: var(--yt-endpoint-color);
+  font-size: 1.2em;
+}
