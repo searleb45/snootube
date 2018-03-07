@@ -82,12 +82,10 @@ class SnooTubeMaterial {
     document.getElementById('comments').appendChild( threadContainer );
 
     threadList.sort((a,b) => a.score - b.score);
-    threadList.forEach((item) => {
+    threadList.forEach(async (item) => {
       if( item.data.url.match(YoutubeData.getVideoId()) ) {
-        ContentRenderer.renderTab( item.data ).then((result) => {
-          console.log(result);
-          tabContainer.innerHTML += result;
-        });
+        let tab = await ContentRenderer.renderTab( item.data );
+        tabContainer.innerHTML += tab;
       }
     });
 
@@ -103,19 +101,20 @@ class SnooTube_Old {
 }
 
 class ContentRenderer {
-  static _loadTemplate( templateName ) {
-    return fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'})
-      .then(res => res.text())
-      .then(body => body);
+  static async _loadTemplate( templateName ) {
+    console.log('fetching tab template');
+    let response = await fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'});
+
+    if( response.status === 200 ) {
+      let template = await response.text();
+      return template;
+    }
   }
 
-  static renderTab( redditResult ) {
-    return this._loadTemplate( 'snootubeTabTemplate' ).then( (template) => {
-      console.log('Got template');
-      console.log(template);
-      console.log(redditResult);
-      return mustache(template, redditResult);
-    });
+  static async renderTab( redditResult ) {
+    ContentRenderer.tabTemplate = ContentRenderer.tabTemplate || await this._loadTemplate('snootubeTabTemplate');
+    console.log(redditResult);
+    return mustache(ContentRenderer.tabTemplate, redditResult);
   }
 }
 
@@ -124,18 +123,20 @@ class RedditLoader {
     this.snootube = snootubeInstance;
   }
 
-  searchForPosts( vidId ) {
+  async searchForPosts( vidId ) {
     let query = `(url:${vidId}) (site:youtube.com OR site:youtu.be)`;
 
-    fetch( 'https://api.reddit.com/search.json?q=' + query, {mode: 'cors'} ).then((result) => {
-      result.json().then((obj) => {
-        if( obj && obj.kind === 'Listing' && obj.data.children.length > 0 ) {
-          this.snootube.showThreadResults( obj.data.children );
-        } else {
-          this.snootube.showNoResults();
-        }
-      });
-    });
+    let result = await fetch( 'https://api.reddit.com/search.json?q=' + query, {mode: 'cors'} );
+
+    if( result.status === 200 ) {
+     let json = await result.json();
+     if( json && json.kind === 'Listing' && json.data.children.length > 0 ) {
+       this.snootube.showThreadResults( json.data.children );
+       return;
+     }
+    }
+
+    this.snootube.showNoResults();
   }
 }
 
@@ -164,12 +165,6 @@ class YoutubeData {
 
 function init() {
   console.log("SnooTube initialized!");
-
-  if( typeof mustache !== 'undefined' ) {
-    console.log('Mustache defined');
-    console.log(mustache);
-    console.log(mustache('<div>{{test}}</div>', {test: 'hi'}));
-  }
 
   if( YoutubeData.isVideoPage() ) {
     console.log("Yes, is video page");

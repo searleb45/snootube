@@ -49,11 +49,11 @@
 
 .snoo-tabs.visible {
   display: flex!important;
-  justify-content: center;
+  justify-content: space-between;;
 }
 
 .snootube-tab {
-  flex-grow: 1;
+  flex: 1;
   height: 45px;
   background-color: transparent;
   border-radius: 0;
