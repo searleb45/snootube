@@ -17,12 +17,13 @@ class SnooTubeMaterial {
     });
   }
 
-  removeExistingComments(cb) { 
+  removeExistingComments(cb) {
     let observer = new MutationObserver((mutations) => {
       if( document.getElementById('comments') ) {
         let ytComments = document.getElementById('comments');
         let newComments = document.createElement('div');
         newComments.id = 'comments';
+        newComments.className = 'ytd-watch snootube-container';
         ytComments.parentNode.replaceChild(newComments, ytComments);
         observer.disconnect();
         if( typeof(cb) === 'function' ) {
@@ -78,12 +79,20 @@ class SnooTubeMaterial {
     threadContainer.className = 'snoo-threads';
 
     document.getElementById('comments').appendChild( tabContainer )
-    document.getElementById('comments').appendChild(threadContainer);
+    document.getElementById('comments').appendChild( threadContainer );
+
+    threadList.sort((a,b) => a.score - b.score);
     threadList.forEach((item) => {
       if( item.data.url.match(YoutubeData.getVideoId()) ) {
-        ContentRenderer.renderTab( item );
+        ContentRenderer.renderTab( item.data ).then((result) => {
+          console.log(result);
+          tabContainer.innerHTML += result;
+        });
       }
     });
+
+    this.hideLoadingScreen();
+    tabContainer.classList.add('visible');
   }
 }
 
@@ -101,9 +110,11 @@ class ContentRenderer {
   }
 
   static renderTab( redditResult ) {
-    this._loadTemplate( 'snootubeTabTemplate' ).then( (template) => {
+    return this._loadTemplate( 'snootubeTabTemplate' ).then( (template) => {
       console.log('Got template');
       console.log(template);
+      console.log(redditResult);
+      return mustache(template, redditResult);
     });
   }
 }
@@ -134,7 +145,7 @@ class YoutubeData {
   }
 
   static isMaterialYoutube() {
-    return document.querySelector('#polymer-app') !== null;
+    return document.querySelector('ytd-app') !== null;
   }
 
   static getVideoId() {
@@ -154,6 +165,12 @@ class YoutubeData {
 function init() {
   console.log("SnooTube initialized!");
 
+  if( typeof mustache !== 'undefined' ) {
+    console.log('Mustache defined');
+    console.log(mustache);
+    console.log(mustache('<div>{{test}}</div>', {test: 'hi'}));
+  }
+
   if( YoutubeData.isVideoPage() ) {
     console.log("Yes, is video page");
 
@@ -162,6 +179,8 @@ function init() {
     } else {
       snootubeInstance = new SnooTube_Old();
     }
+  } else {
+    console.log('is not video page');
   }
 }
 

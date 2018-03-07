@@ -5,7 +5,6 @@
 
     "description": "Replace YouTube comments with Reddit comments!",
     "icons": {
-        // TODO: Icons
     },
 
     "content_scripts": [
