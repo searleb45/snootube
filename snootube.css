@@ -41,8 +41,6 @@
 }
 .snootube-container {
   color: var(--yt-primary-text-color);
-  font-weight: bold;
-  font-size: 1.45em;
 }
 .snoo-tabs,.snoo-threads,.snoo-no-results { display: none; }
 .visible { display: block; }
@@ -62,6 +60,8 @@
   border-right: 1px solid var(--yt-primary-text-color);
   cursor: pointer;
   color: var(--yt-primary-text-color);
+  font-weight: bold;
+  font-size: 1.2em;
 }
 .snootube-tab:last-of-type {
   border-right: 0;

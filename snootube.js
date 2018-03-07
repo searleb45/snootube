@@ -72,6 +72,10 @@ class SnooTubeMaterial {
     this.redditAccessor.searchForPosts( vidId );
   }
 
+  // findCommentsForPost( post ) {
+
+  // }
+
   showThreadResults( threadList ) {
     let tabContainer = document.createElement('div'),
         threadContainer = document.createElement('div');
@@ -88,6 +92,17 @@ class SnooTubeMaterial {
         tabContainer.innerHTML += tab;
       }
     });
+
+    let snooTabs = document.querySelectorAll('.snootube-tab');
+    [...snooTabs].forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        console.log(e.target.dataset.id);
+      });
+    });
+    // document.querySelectorAll('.snootube-tab').addEventListener('click', (e) => {
+    //   console.log(e.target.dataset.id);
+    //   //this.showPostView( e.target.dataset.id );
+    // });
 
     this.hideLoadingScreen();
     tabContainer.classList.add('visible');
@@ -138,6 +153,22 @@ class RedditLoader {
 
     this.snootube.showNoResults();
   }
+
+  // async getCommentsForPost( subreddit, postId ) {
+  //   let postUrl = `https://api.reddit.com/r/${subreddit}/${postId}.json`;
+
+  //   let result = await fetch( postUrl, {mode: 'cors'} );
+
+  //   if( result.status = 200 ) {
+  //     let json = await result.json();
+
+  //     if( json && json[1] && json[1].kind === 'Listing' && json[1].data && json[1].data.length ) {
+  //       return json[1].data.children;
+  //     }
+  //   }
+
+  //   this.snootube.showCouldNotFetchPost();
+  // }
 }
 
 class YoutubeData {
