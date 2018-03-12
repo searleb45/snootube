@@ -5,6 +5,7 @@ var snootubeInstance;
 class SnooTubeMaterial {
   constructor() {
     let self = this;
+    ContentRenderer.init();
     self.redditAccessor = new RedditLoader(this);
 
     window.addEventListener('message', (msg) => {
@@ -116,7 +117,6 @@ class SnooTubeMaterial {
         item.data.score = item.data.score.toLocaleString();
         let tab = await ContentRenderer.renderTab( item.data );
         tab.addEventListener('click', (e) => {
-          console.log('getting comments');
           document.querySelectorAll('.snootube-post-body').forEach((el) => el.classList.remove('visible'));
           document.querySelectorAll('.snootube-tab').forEach((el) => el.classList.remove('active'));
           document.getElementById(e.target.dataset.id).classList.add('visible');
@@ -148,8 +148,12 @@ class SnooTube_Old {
 }
 
 class ContentRenderer {
+  static async init() {
+    ContentRenderer.tabTemplate = await this._loadTemplate('snootubeTabTemplate');
+    ContentRenderer.postTemplate = await this._loadTemplate('snootubeMainPostTemplate');
+  }
+
   static async _loadTemplate( templateName ) {
-    console.log('loading template');
     let response = await fetch(chrome.extension.getURL(`/templates/${templateName}.html`), {mode: 'cors'});
 
     if( response.status === 200 ) {
