@@ -21,11 +21,10 @@ class SnooTubeMaterial {
     let observer = new MutationObserver((mutations) => {
       if( document.getElementById('comments') ) {
         let ytComments = document.getElementById('comments');
-        window.ytComments = ytComments;
         let newComments = document.createElement('div');
         newComments.id = 'comments';
         newComments.className = 'ytd-watch snootube-container';
-        ytComments.parentNode.replaceChild(newComments, ytComments);
+        ytComments.replaceWith(newComments);
         observer.disconnect();
         if( typeof(cb) === 'function' ) {
           cb();
@@ -73,13 +72,16 @@ class SnooTubeMaterial {
     this.redditAccessor.searchForPosts( vidId );
   }
 
-  // findCommentsForPost( post ) {
+  async findCommentsForPost( post ) {
+    this.showLoadingScreen();
 
-  // }
+    let comments = await this.redditAccessor.getCommentsForPost(post.subreddit, post.id);
+    console.log(comments);
+  }
 
   appendTabs( tabList, tabContainer ) {
     // Sort posts by number of upvotes
-    tabList.sort((a,b) => parseInt(b.getAttribute('score')) - parseInt(a.getAttribute('score')));
+    tabList.sort((a,b) => parseInt(b.getAttribute('score').replace(/,/g, '')) - parseInt(a.getAttribute('score').replace(/,/g, '')));
 
     // Filter duplicate posts in one subreddit
     let subs = [];
@@ -113,10 +115,11 @@ class SnooTubeMaterial {
         item.data.score = item.data.score.toLocaleString();
         let tab = await ContentRenderer.renderTab( item.data );
         tab.addEventListener('click', (e) => {
-          console.log(e.target.dataset.id);
+          console.log('getting comments');
           document.querySelectorAll('.snootube-post-body').forEach((el) => el.classList.remove('visible'));
           document.querySelectorAll('.snootube-tab').forEach((el) => el.classList.remove('active'));
           document.getElementById(e.target.dataset.id).classList.add('visible');
+          this.findCommentsForPost(item.data);
           e.target.classList.add('active');
         });
         tabList.push(tab);
@@ -241,7 +244,6 @@ class ContentRenderer {
     }
 
     return new Date(timestamp * 1000).toLocaleString();
-
   }
 
   static _templatize( templateString, data ) {
@@ -272,21 +274,21 @@ class RedditLoader {
     this.snootube.showNoResults();
   }
 
-  // async getCommentsForPost( subreddit, postId ) {
-  //   let postUrl = `https://api.reddit.com/r/${subreddit}/${postId}.json`;
+  async getCommentsForPost( subreddit, postId ) {
+    let postUrl = `https://api.reddit.com/r/${subreddit}/comments/${postId}.json`;
 
-  //   let result = await fetch( postUrl, {mode: 'cors'} );
+    let result = await fetch( postUrl, {mode: 'cors'} );
 
-  //   if( result.status = 200 ) {
-  //     let json = await result.json();
+    if( result.status === 200 ) {
+      let json = await result.json();
+      console.log(json);
 
-  //     if( json && json[1] && json[1].kind === 'Listing' && json[1].data && json[1].data.length ) {
-  //       return json[1].data.children;
-  //     }
-  //   }
-
-  //   this.snootube.showCouldNotFetchPost();
-  // }
+      if( json && json[1] && json[1].kind === 'Listing' && json[1].data && json[1].data.children.length ) {
+        return json[1].data.children;
+      }
+    }
+    this.snootube.showCouldNotFetchPost();
+  }
 }
 
 class YoutubeData {
