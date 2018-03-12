@@ -134,24 +134,24 @@
 .snoo-dropdown .snoo-dropdown-container .snootube-tab {
   text-align: left;
   height: 30px;
+  padding-bottom: 0;
+  border-radius: 3px;
 }
 
 .post-head {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding-top: 1em;
 }
 .post-score {
   font-size: 1.5em;
   font-weight: bold;
-  flex-basis: 3em;
+  padding: 0 1em;
   text-align: center;
-}
-.post-text {
-  flex-basis: calc(100% - 3em);
 }
 .post-title a {
   color: var(--yt-endpoint-color);
   font-size: 1.3em;
+  line-height: 1.2em;
 }
