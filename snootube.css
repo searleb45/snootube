@@ -56,18 +56,102 @@
   background-color: transparent;
   border-radius: 0;
   border: 0;
-  border-bottom: 1px solid var(--yt-primary-text-color);
+  /* border-bottom: 1px solid var(--yt-primary-text-color); */
   border-right: 1px solid var(--yt-primary-text-color);
   cursor: pointer;
   color: var(--yt-primary-text-color);
   font-weight: bold;
   font-size: 1.2em;
+  padding-bottom: 4px;
 }
-.snootube-tab:last-of-type {
+.snootube-tab:last-child {
   border-right: 0;
 }
+.snootube-tab .snootube-tab {
+  border: 0;
+  width: 100%;
+}
+.snootube-tab:not(.active):not(.snoo-dropdown):hover {
+  background-color: #bbb;
+}
+[dark] .snootube-tab:not(.active):not(.snoo-dropdown):hover {
+  background-color: #888;
+}
+.snootube-tab.active {
+  border-bottom: 5px solid orangered;
+  padding-bottom: 0;
+  color: orangered;
+  cursor: auto;
+}
 
+.snoo-dropdown {
+  position: relative;
+  flex: 0 0 40px;
+  padding-bottom: 0;
+}
+
+.snoo-dropdown:before {
+  display: block;
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 7px solid var(--yt-primary-text-color);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 19px;
+}
+
+.snoo-dropdown:hover {
+  background-color: #eee;
+}
+.snoo-dropdown .snoo-dropdown-container {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 45px;
+  list-style: none;
+  margin: 0;
+  padding: 1em;
+  min-width: 20vw;
+  text-align: left;
+  background-color: #eee;
+}
+
+[dark] .snoo-dropdown .snoo-dropdown-container {
+  background-color: #222;
+}
+[dark] .snoo-dropdown:hover {
+  background-color: #222;
+}
+
+.snoo-dropdown:hover .snoo-dropdown-container {
+  display: block;
+}
+
+.snoo-dropdown .snoo-dropdown-container .snootube-tab {
+  text-align: left;
+  height: 30px;
+}
+
+.post-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1em;
+}
+.post-score {
+  font-size: 1.5em;
+  font-weight: bold;
+  flex-basis: 3em;
+  text-align: center;
+}
+.post-text {
+  flex-basis: calc(100% - 3em);
+}
 .post-title a {
   color: var(--yt-endpoint-color);
-  font-size: 1.2em;
+  font-size: 1.3em;
 }

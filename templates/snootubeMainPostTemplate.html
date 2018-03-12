@@ -1,9 +1,16 @@
 <div class="snootube-post-body" id="{{id}}">
-  <div class="post-title">
-    <a href="https://reddit.com{{permalink}}">{{title}}</a>
-  </div>
-  <div class="post-author-info">
-    by {{author}} | {{num_comments}} comments | {{post_time}}
+  <div class="post-head">
+    <aside class="post-score">
+      {{score}}
+    </aside>
+    <div class="post-text">
+      <div class="post-title">
+        <a href="https://reddit.com{{permalink}}">{{title}}</a>
+      </div>
+      <div class="post-author-info">
+        by {{author}} | {{num_comments}} comments | {{post_time}}
+      </div>
+    </div>
   </div>
   <div class="comments"></div>
 </div>
