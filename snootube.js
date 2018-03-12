@@ -66,10 +66,11 @@ class SnooTubeMaterial {
     this.hideLoadingScreen();
   }
 
-  findPostsForVideo( vidId ) {
+  async findPostsForVideo( vidId ) {
     this.showLoadingScreen();
 
-    this.redditAccessor.searchForPosts( vidId );
+    let posts = await this.redditAccessor.searchForPosts( vidId );
+    this.showThreadResults(posts);
   }
 
   async findCommentsForPost( post ) {
@@ -266,8 +267,7 @@ class RedditLoader {
     if( result.status === 200 ) {
      let json = await result.json();
      if( json && json.kind === 'Listing' && json.data.children.length > 0 ) {
-       this.snootube.showThreadResults( json.data.children );
-       return;
+       return json.data.children;
      }
     }
 
@@ -281,7 +281,6 @@ class RedditLoader {
 
     if( result.status === 200 ) {
       let json = await result.json();
-      console.log(json);
 
       if( json && json[1] && json[1].kind === 'Listing' && json[1].data && json[1].data.children.length ) {
         return json[1].data.children;
@@ -318,8 +317,6 @@ function init() {
   console.log("SnooTube initialized!");
 
   if( YoutubeData.isVideoPage() ) {
-    console.log("Yes, is video page");
-
     if( YoutubeData.isMaterialYoutube() ) {
       snootubeInstance = new SnooTubeMaterial();
     } else {
