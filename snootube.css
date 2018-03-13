@@ -155,3 +155,12 @@
   font-size: 1.3em;
   line-height: 1.2em;
 }
+.snoo-comment .comment-content {
+  padding: 10px 0;
+  font-size: 14px;
+}
+.snoo-comment .comments {
+  margin-left: 10px;
+  border-left: 1px dashed white;
+  padding-left: 10px;
+}

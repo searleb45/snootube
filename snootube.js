@@ -74,11 +74,15 @@ class SnooTubeMaterial {
     this.showThreadResults(posts);
   }
 
-  async findCommentsForPost( post ) {
+  async findCommentsForPost( post, postId ) {
     this.showLoadingScreen();
 
     let comments = await this.redditAccessor.getCommentsForPost(post.subreddit, post.id);
     console.log(comments);
+    let commentFragment = await ContentRenderer.renderComments(comments);
+    document.getElementById(postId).appendChild(commentFragment);
+    console.log('comments rendered');
+    this.hideLoadingScreen();
   }
 
   appendTabs( tabList, tabContainer ) {
@@ -113,14 +117,14 @@ class SnooTubeMaterial {
     document.getElementById('comments').appendChild( threadContainer );
     let tabList = [];
     await Promise.all(threadList.map(async (item) => {
-      if( item.data.url.match(YoutubeData.getVideoId()) ) {
+      if( item.data.url.match(YoutubeData.getVideoId()) && item.data.score > 0 && item.data.num_comments > 0 ) {
         item.data.score = item.data.score.toLocaleString();
         let tab = await ContentRenderer.renderTab( item.data );
         tab.addEventListener('click', (e) => {
           document.querySelectorAll('.snootube-post-body').forEach((el) => el.classList.remove('visible'));
           document.querySelectorAll('.snootube-tab').forEach((el) => el.classList.remove('active'));
           document.getElementById(e.target.dataset.id).classList.add('visible');
-          this.findCommentsForPost(item.data);
+          this.findCommentsForPost(item.data, e.target.dataset.id);
           e.target.classList.add('active');
         });
         tabList.push(tab);
@@ -151,6 +155,7 @@ class ContentRenderer {
   static async init() {
     ContentRenderer.tabTemplate = await this._loadTemplate('snootubeTabTemplate');
     ContentRenderer.postTemplate = await this._loadTemplate('snootubeMainPostTemplate');
+    ContentRenderer.commentTemplate = await this._loadTemplate('snootubeCommentTemplate');
   }
 
   static async _loadTemplate( templateName ) {
@@ -171,6 +176,24 @@ class ContentRenderer {
   static async renderPost( redditResult ) {
     ContentRenderer.postTemplate = ContentRenderer.postTemplate || await this._loadTemplate('snootubeMainPostTemplate');
     return this._templatize(ContentRenderer.postTemplate, redditResult);
+  }
+
+  static async renderComments( commentList ) {
+    ContentRenderer.commentTemplate = ContentRenderer.commentTemplate || await this._loadTemplate('snootubeCommentTemplate');
+    let commentFragment = document.createDocumentFragment();
+
+    for(let i=0; i<commentList.length; i++) {
+      let comment = commentList[i];
+
+      if( comment.kind === 't1' ) {
+        let commentElement = this._templatize(ContentRenderer.commentTemplate, comment.data);
+        if( comment.data.replies && comment.data.replies.kind === 'Listing' && comment.data.replies.data.children ) {
+          commentElement.querySelector('.comments').appendChild( await this.renderComments(comment.data.replies.data.children) );
+        }
+        commentFragment.appendChild(commentElement);
+      }
+    }
+    return commentFragment;
   }
 
   static generateTabDropdown( elements ) {

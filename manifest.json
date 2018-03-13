@@ -18,7 +18,8 @@
     "web_accessible_resources": [
         "templates/snootubeTabTemplate.html",
         "templates/snootubeContentTemplate.html",
-        "templates/snootubeMainPostTemplate.html"
+        "templates/snootubeMainPostTemplate.html",
+        "templates/snootubeCommentTemplate.html"
     ],
 
     "permissions": [
